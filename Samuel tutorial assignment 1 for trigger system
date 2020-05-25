@@ -1,0 +1,78 @@
+int tilt = 13;
+int button=7;
+int status=0; 
+int LED=8;
+int buttonState=0;
+int count=5;
+#include<LiquidCrystal.h>
+const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+
+
+void setup() {
+  
+  pinMode(tilt, INPUT);
+  pinMode(button,INPUT);
+pinMode(LED,OUTPUT);
+  lcd.begin(16,2);
+   
+}
+
+// the loop routine runs over and over again forever:
+void loop() {
+ status=digitalRead(tilt); 
+  buttonState = digitalRead(button);
+   lcd.setCursor(1,0);
+    
+  //tilt activated 
+  if( status==LOW){
+
+    //Button trigger 
+    if(buttonState==HIGH&&count!=0){
+     digitalWrite(LED, HIGH);
+      count--;
+      delay(500);
+    }else
+        digitalWrite(LED, LOW);
+    lcd.print("Engaged");
+      lcd.setCursor(0,1);
+      lcd.print("Counts left ");
+    lcd.print(count);
+    //When count hits 0 
+         if(buttonState==HIGH&&count==0){
+           lcd.clear();
+           lcd.print("Out of counts");
+     delay(1000);
+           lcd.clear();                           
+    }
+     
+  }else 
+    if( status==HIGH) {
+    lcd.clear();
+  }
+  
+  //reloading when count hits 0 that causes a delay
+  if( status==HIGH&&count==0){
+       lcd.print("Refilling");
+       delay(5000);
+    count=5;
+     lcd.clear();
+    lcd.print("Complete!");
+    delay(1000);
+    lcd.clear();
+  }
+  
+      //reloading when count bigger than 0
+    if( status==HIGH&&count!=5){
+      count++; 
+  }
+ 
+  
+
+  }
+
+
+  
+
+
+              
