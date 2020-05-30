@@ -1,0 +1,22 @@
+#include <IRSendRevInt.h> //IR emiiter and reciever
+#include <IRSendRev.h>
+
+#include <paj7620.h> //gesture controller
+
+void setup() {
+paj7620Init(); //Gesture controller 
+ pinMode(6, OUTPUT); //buzzer
+}
+
+void loop() {
+ uint8_t data = 0; 
+  paj7620ReadReg(0x43, 1, &data); 
+  if(data=GES_UP_FLAG){
+    digitalWrite(6, HIGH);
+  delay(1000);
+  digitalWrite(6, LOW);
+  delay(1000);
+  }
+
+}
+
