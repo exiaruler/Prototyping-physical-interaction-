@@ -68,15 +68,36 @@ uint8_t data = 0, data1 = 0, error;
   //starting session declare button 
   
     //Game session
-    while(health!=0){
+
        lcd.setCursor(1,0);
        lcd.print("Alive");
         lcd.setCursor(0,1);
        lcd.print("ready to fire");
        //gesture controller
+       if(ammo!=0){
       if (!error) {
         switch (data) {             
-            case GES_UP_FLAG:
+         /*
+                case GES_UP_FLAG:
+                delay(800);
+                paj7620ReadReg(0x43, 1, &data);
+                if (data == GES_DOWN_FLAG) {
+                    Serial.println("Up-Down");
+                } else if (data == GES_FORWARD_FLAG) {
+                    Serial.println("Forward");
+                    delay(800);
+                } else if (data == GES_BACKWARD_FLAG) {
+                    Serial.println("Backward");
+                    delay(800);
+                } else {
+                       IR.Send(dtaSend, 38);
+                   ammo--;
+                    Serial.println("Up");
+                    Serial.println("send");
+                }
+                break;
+                */
+                case GES_UP_FLAG:
                 delay(800);
                 paj7620ReadReg(0x43, 1, &data);
                 if (data == GES_FORWARD_FLAG&&ammo!=0) {
@@ -89,30 +110,71 @@ uint8_t data = 0, data1 = 0, error;
                       
                 }
                 break;
-               
-           
         }
     }
     delay(100);
+       }
+       
+  if(ammo==0){
+    lcd.print("Reload time:");
+    int randNumber = random(1,6);
+    lcd.setCursor(13,0);
+    lcd.print(randNumber);
+    lcd.setCursor(0,1); 
+    switch(randNumber){
+      
+      case 5:
+      lcd.print(randNumber);
+      delay(1000);
+      randNumber--;
+      lcd.clear();
 
-     if(ammo==0){
-     reload(); 
-                }
-  //Gettting hit
-    if (IR.IsDta()) {
+      case 4:
+      lcd.print(randNumber);
+      delay(1000);
+      randNumber--;
+      lcd.clear();
+
+      case 3:
+      lcd.print(randNumber);
+      delay(1000);
+      randNumber--;
+      lcd.clear();
+
+      case 2:
+      lcd.print(randNumber);
+      delay(1000);
+      randNumber--;
+      lcd.clear();
+
+      case 1:
+      lcd.print(randNumber);
+      delay(1000);
+      lcd.clear();
+        ammo++; 
+      break;
+
+    
+      
+}
+  }
+     
+  
+    
+
+ 
+  
+   if (IR.IsDta()) {
     // get IR data
     lcd.clear();
         IR.Recv(dta); // receive data to dta
         health--;
-        alert(); 
   lcd.print("game over");
-  break;
+  
     }
-    }
-    //if button is pressed resets the game 
-    while(health==0){
-     
-    }
+    
+
+   
 }
 
 void start(){
@@ -202,8 +264,6 @@ void distance(){
       Serial.println("False");
     }
 }
-
-
 
 
  
