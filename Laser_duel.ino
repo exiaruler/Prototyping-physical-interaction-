@@ -27,8 +27,7 @@ int health=1;
 int ammo=1;
 long randNumber;
 double check = 300; 
-    
-//transmitted data
+
 void dtaInit() {
     dtaSend[BIT_LEN]        = 11;      // all data that needs to be sent
     dtaSend[BIT_START_H]    = 179;      // the logic high duration of "Start"
@@ -46,8 +45,9 @@ void dtaInit() {
     dtaSend[BIT_DATA + 4]     = 192;
     dtaSend[BIT_DATA + 5]     = 63;
 }
+
 void setup() {
-    Serial.begin(115200);
+  Serial.begin(115200);
     IR.Init(pinRecv);
     Serial.println("init over");
      dtaInit();
@@ -57,189 +57,55 @@ uint8_t error = 0;
 //LCD
 lcd.begin(16, 2);
  lcd.setRGB(colorR, colorG, colorB);
+   randomSeed(analogRead(0));
  
 
+
 }
-unsigned char dta[20];//dta array
+
+
+unsigned char dta[20];
 
 void loop() {
 uint8_t data = 0, data1 = 0, error;
-    error = paj7620ReadReg(0x43, 1, &data);  
-  //starting session declare button 
-  
-    //Game session
 
+
+ 
+    error = paj7620ReadReg(0x43, 1, &data);   
        lcd.setCursor(1,0);
        lcd.print("Alive");
         lcd.setCursor(0,1);
-       lcd.print("ready to fire");
-       //gesture controller
-       if(ammo!=0){
+       lcd.print("ready to fire");  
+//Serial.println(distanceSensor.measureDistanceCm());
+    //delay(500);
+
+             
       if (!error) {
-        switch (data) {             
-         /*
-                case GES_UP_FLAG:
-                delay(800);
+        switch (data) {               // When different gestures be detected, the variable 'data' will be set to different values by paj7620ReadReg(0x43, 1, &data).
+            case GES_UP_FLAG:
+                //delay(800);
+                
                 paj7620ReadReg(0x43, 1, &data);
-                if (data == GES_DOWN_FLAG) {
-                    Serial.println("Up-Down");
-                } else if (data == GES_FORWARD_FLAG) {
-                    Serial.println("Forward");
-                    delay(800);
-                } else if (data == GES_BACKWARD_FLAG) {
-                    Serial.println("Backward");
-                    delay(800);
+                if (data == GES_FORWARD_FLAG) {
                 } else {
-                       IR.Send(dtaSend, 38);
-                   ammo--;
-                    Serial.println("Up");
-                    Serial.println("send");
-                }
-                break;
-                */
-                case GES_UP_FLAG:
-                delay(800);
-                paj7620ReadReg(0x43, 1, &data);
-                if (data == GES_FORWARD_FLAG&&ammo!=0) {
-                } else {
-                      //double distance = distanceSensor.measureDistanceCm();
                       
                       IR.Send(dtaSend, 38);
-                      ammo--; 
-                    Serial.println("send");
-                      
-                }
-                break;
-        }
+                    Serial.println("send"); 
+                    alert();
+                   //ammo-1;
+                  delay(random(1000,5000));
+                  
+                  }
+                
+              
     }
-    delay(100);
-       }
-       
-  if(ammo==0){
-    lcd.print("Reload time:");
-    int randNumber = random(1,6);
-    lcd.setCursor(13,0);
-    lcd.print(randNumber);
-    lcd.setCursor(0,1); 
-    switch(randNumber){
-      
-      case 5:
-      lcd.print(randNumber);
-      delay(1000);
-      randNumber--;
-      lcd.clear();
-
-      case 4:
-      lcd.print(randNumber);
-      delay(1000);
-      randNumber--;
-      lcd.clear();
-
-      case 3:
-      lcd.print(randNumber);
-      delay(1000);
-      randNumber--;
-      lcd.clear();
-
-      case 2:
-      lcd.print(randNumber);
-      delay(1000);
-      randNumber--;
-      lcd.clear();
-
-      case 1:
-      lcd.print(randNumber);
-      delay(1000);
-      lcd.clear();
-        ammo++; 
-      break;
-
-    
-      
-}
   }
-     
-  
-    
-
  
+  hit();
   
-   if (IR.IsDta()) {
-    // get IR data
-    lcd.clear();
-        IR.Recv(dta); // receive data to dta
-        health--;
-  lcd.print("game over");
+
+
   
-    }
-    
-
-   
-}
-
-void start(){
-   lcd.clear();
-    lcd.print("5");
-    delay(1000);
-    lcd.clear();
-    lcd.print("4");
-    delay(1000);
-    lcd.clear();
-    lcd.print("3");
-    delay(1000);
-    lcd.clear();
-    lcd.print("2");
-    delay(1000);
-    lcd.clear();
-    lcd.print("1");
-    delay(1000);
-    lcd.clear();
-    lcd.print("Start");
-    delay(1000);
-    lcd.clear();
-}
-
-void reload(){
-   lcd.print("Reload time:");
-    int randNumber = random(1,6);
-    lcd.setCursor(13,0);
-    lcd.print(randNumber);
-    lcd.setCursor(0,1); 
-    switch(randNumber){
-      
-      case 5:
-      lcd.print(randNumber);
-      delay(1000);
-      randNumber--;
-      lcd.clear();
-
-      case 4:
-      lcd.print(randNumber);
-      delay(1000);
-      randNumber--;
-      lcd.clear();
-
-      case 3:
-      lcd.print(randNumber);
-      delay(1000);
-      randNumber--;
-      lcd.clear();
-
-      case 2:
-      lcd.print(randNumber);
-      delay(1000);
-      randNumber--;
-      lcd.clear();
-
-      case 1:
-      lcd.print(randNumber);
-      delay(1000);
-      lcd.clear();
-      break;
-
-      ammo++; 
-      
-}
 }
 void alert(){
     digitalWrite(MoPin, HIGH);
@@ -249,21 +115,23 @@ void alert(){
     delay(1000);
 }
 
-void distance(){
-  Serial.println(distanceSensor.measureDistanceCm());
-    delay(500);
-    
-    double check = 300; 
-    double distance = distanceSensor.measureDistanceCm();
-    if (distance < check)
-    {
-      Serial.println("True"); 
-    }
-    else
-    {
-      Serial.println("False");
-    }
+void gameOver(){
+    digitalWrite(MoPin, HIGH);
+    delay(5000);
+ 
+    digitalWrite(MoPin, LOW);
+    delay(1000);
 }
 
+void hit(){
+     if (IR.IsDta()) {               // get IR data
+        IR.Recv(dta);               // receive data to dta
+  Serial.print("recieved");
+  health--;
+        lcd.clear();
+  lcd.print("game over");
+  gameOver();
+    }
+}
 
  
